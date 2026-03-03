@@ -12,7 +12,6 @@ export class ProductService {
 
   private baseUrl = environment.shopApiUrl + '/products';
   private categoryUrl = environment.shopApiUrl + '/product-categories';
-  private searchUrl = environment.shopApiUrl + '/products/search';
 
   constructor (private httpClient: HttpClient) { }
 
@@ -32,7 +31,7 @@ export class ProductService {
     thePageSize: number,
     theCategoryId: number): Observable<ApiResponseProduct> {
 
-    const searchUrl = `${ this.baseUrl }/search/category?id=${ theCategoryId }`
+    const searchUrl = `${ this.baseUrl }/category?id=${ theCategoryId }`
       + `&page=${ thePage }&size=${ thePageSize }`;
 
     return this.httpClient.get<ApiResponseProduct>(searchUrl)
@@ -46,8 +45,7 @@ export class ProductService {
   }
 
   searchProducts(theKeyword: string | null): Observable<Product[]> {
-    const searchUrl = `${ this.searchUrl }?name=${ theKeyword }`;
-    console.log(searchUrl);
+    const searchUrl = `${ this.baseUrl }?name=${ theKeyword }`;
     return this.getProducts(searchUrl);
   }
 
@@ -56,7 +54,7 @@ export class ProductService {
     thePageSize: number,
     theKeyword: string): Observable<ApiResponseProduct> {
 
-    const searchUrl = `${ this.searchUrl }?name=${ theKeyword }`
+    const searchUrl = `${ this.baseUrl }?name=${ theKeyword }`
       + `&page=${ thePage }&size=${ thePageSize }`;
 
     return this.httpClient.get<ApiResponseProduct>(searchUrl)
@@ -64,7 +62,7 @@ export class ProductService {
   }
 
   getOneProductById(id: number): Observable<Product> {
-    const url = `${ this.searchUrl }/${ id }`;
+    const url = `${ this.baseUrl }/${ id }`;
     return this.httpClient.get<Product>(url)
       .pipe(map(product => product));
   }
