@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Component
@@ -29,15 +29,15 @@ public class JwtTokenProvider {
         Date expireDate = new Date(currentDate.getTime() + jwtExpirationDate);
 
         String token = Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(expireDate)
+                .subject(username)
+                .issuedAt(new Date())
+                .expiration(expireDate)
                 .signWith(key())
                 .compact();
         return token;
     }
 
-    private Key key(){
+    private SecretKey key(){
         return Keys.hmacShaKeyFor(
                 Decoders.BASE64.decode(jwtSecret)
         );
@@ -45,11 +45,11 @@ public class JwtTokenProvider {
 
     // get username from Jwt token
     public String getUsername(String token){
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key())
+        Claims claims = Jwts.parser()
+                .verifyWith(key())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
         String username = claims.getSubject();
         return username;
     }
@@ -57,10 +57,10 @@ public class JwtTokenProvider {
     // validate Jwt token
     public boolean validateToken(String token){
         try{
-            Jwts.parserBuilder()
-                    .setSigningKey(key())
+            Jwts.parser()
+                    .verifyWith(key())
                     .build()
-                    .parse(token);
+                    .parseSignedClaims(token);
             return true;
         } catch (MalformedJwtException ex) {
             throw new ShopAPIException(HttpStatus.BAD_REQUEST, "Invalid JWT token");

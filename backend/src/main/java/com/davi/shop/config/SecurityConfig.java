@@ -49,48 +49,34 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http)
 	    throws Exception {
 
-	endpointRolesAndAccess(http);
+	http
+	    .csrf(csrf -> csrf.disable())
+	    .cors(withDefaults())
+	    .authorizeHttpRequests(auth -> auth
+		.requestMatchers("/h2/**").permitAll()
+		.requestMatchers("/api/orders/**").authenticated()
+		.requestMatchers("/states/**").permitAll()
+		.requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+		.requestMatchers("/countries/**").permitAll()
+		.requestMatchers(HttpMethod.GET, "/product-categories/**").permitAll()
+		.requestMatchers("/v3/api-docs/**",
+			"/configuration/ui", "/swagger-resources/**",
+			"/configuration/security", "/webjars/**",
+			"/swagger-ui/**").permitAll()
+		.requestMatchers("/checkout/**").permitAll()
+		.requestMatchers("/api/auth/**").permitAll()
+		.requestMatchers("/**").permitAll()
+		.anyRequest().authenticated()
+	    )
+	    .httpBasic(withDefaults())
+	    .exceptionHandling(exception -> exception
+		.authenticationEntryPoint(authenticationEntryPoint))
+	    .sessionManagement(session -> session
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 	http.addFilterBefore(authenticationFilter,
 		UsernamePasswordAuthenticationFilter.class);
 
 	return http.build();
-    }
-
-    private HttpSecurity endpointRolesAndAccess(HttpSecurity http)
-	    throws Exception {
-	return http.csrf().disable().cors().and()
-		.authorizeHttpRequests().requestMatchers("/h2/**")
-		.permitAll()
-		.requestMatchers("/api/orders/**")
-		.authenticated()
-		.requestMatchers("/states/**")
-		.permitAll()
-		.requestMatchers(HttpMethod.GET, "/products/**")
-		.permitAll()
-		.requestMatchers("/countries/**")
-		.permitAll()
-		.requestMatchers(HttpMethod.GET,
-			"/product-categories/**")
-		.permitAll()
-		.requestMatchers("/v3/api-docs/**",
-			"/configuration/ui", "/swagger-resources/**",
-			"/configuration/security", "/webjars/**",
-			"/swagger-ui/**")
-		.permitAll()
-		.requestMatchers("/checkout/**")
-		.permitAll()
-		.requestMatchers("/api/auth/**")
-		.permitAll()
-		.requestMatchers("/**").permitAll()
-		.anyRequest().authenticated()
-		.and()
-		.httpBasic(withDefaults())
-		.exceptionHandling(exception -> exception
-			.authenticationEntryPoint(
-				authenticationEntryPoint))
-		.sessionManagement(
-			session -> session.sessionCreationPolicy(
-				SessionCreationPolicy.STATELESS));
     }
 }

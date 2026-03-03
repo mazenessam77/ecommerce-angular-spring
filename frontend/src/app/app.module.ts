@@ -1,4 +1,4 @@
-import { HttpClientModule, HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -46,7 +46,7 @@ import { AdminAreaComponent } from './components/admin-area/admin-area.component
     AdminAreaComponent
   ],
   imports: [
-    BrowserModule.withServerTransition({ appId: 'serverApp' }),
+    BrowserModule,
     NgbModule,
     ReactiveFormsModule,
     FormsModule,
@@ -59,7 +59,6 @@ import { AdminAreaComponent } from './components/admin-area/admin-area.component
   providers: [
     ProductService,
     CartService,
-    provideHttpClient(),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true }
   ],

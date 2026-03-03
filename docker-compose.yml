@@ -1,8 +1,6 @@
-version: '3.9'
 services:
   db:
-    image: mysql:8
-    command: --default-authentication-plugin=mysql_native_password
+    image: mysql:8.4
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -16,8 +14,8 @@ services:
       timeout: 5s
       retries: 30
   backend:
-    image: davi38/ecommerce-back
-    #build: ./backend
+    build: ./backend
+    #image: davi38/ecommerce-back
     restart: always
     environment:
       MYSQL_URL: jdbc:mysql://db:3306/eshop_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
@@ -43,8 +41,8 @@ services:
       timeout: 5s
       retries: 30
   frontend:
-    image: davi38/ecommerce-front
-    #build: ./frontend
+    build: ./frontend
+    #image: davi38/ecommerce-front
     restart: always
     ports:
       - "4200:4000"

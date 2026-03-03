@@ -11,7 +11,7 @@ import { CartService } from 'src/app/services/cart.service';
 import { CheckoutService } from 'src/app/services/checkout.service';
 import { ShopFormService } from 'src/app/services/shop-form.service';
 import { ShopValidators } from 'src/app/validators/shop-validators';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -46,7 +46,7 @@ export class CheckoutComponent implements OnInit {
 
   isDisabled: boolean = false;
 
-  constructor (
+  constructor(
     private checkoutService: CheckoutService,
     private router: Router,
     private cartService: CartService,
@@ -246,7 +246,7 @@ export class CheckoutComponent implements OnInit {
                 card: this.cardElement,
                 billing_details: {
                   email: purchase.customer.email,
-                  name: `${ purchase.customer.firstName } ${ purchase.customer.lastName }`,
+                  name: `${purchase.customer.firstName} ${purchase.customer.lastName}`,
                   address: {
                     line1: purchase.billingAddress.state,
                     city: purchase.billingAddress.city,
@@ -261,12 +261,12 @@ export class CheckoutComponent implements OnInit {
               handleActions: false
             }).then((result: any) => {
               if (result.error) {
-                alert(`There was an error: ${ result.error.message }`);
+                alert(`There was an error: ${result.error.message}`);
                 this.isDisabled = false;
               } else {
                 this.checkoutService.placeOrder(purchase).subscribe({
                   next: (response: any) => {
-                    alert(`Your order has been received. \nOrder tracking number: ${ response.orderTrackingNumber }`);
+                    alert(`Your order has been received. \nOrder tracking number: ${response.orderTrackingNumber}`);
 
                     //reset cart
                     this.isDisabled = false;
@@ -274,7 +274,7 @@ export class CheckoutComponent implements OnInit {
                   },
                   error: (err: any) => {
                     this.isDisabled = false;
-                    alert(`There was an error: ${ err.message }`);
+                    alert(`There was an error: ${err.message}`);
                   }
                 });
               }
@@ -357,8 +357,8 @@ export class CheckoutComponent implements OnInit {
     const countryCode = formGroup?.value.country.code;
     const countryName = formGroup?.value.country.name;
 
-    console.log(`${ formGroupName } country code: ${ countryCode }`);
-    console.log(`${ formGroupName } country name: ${ countryName }`);
+    console.log(`${formGroupName} country code: ${countryCode}`);
+    console.log(`${formGroupName} country name: ${countryName}`);
 
     this.shopFormService.getStates(countryCode).subscribe(
       data => {
