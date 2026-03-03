@@ -202,7 +202,14 @@ export class CheckoutComponent implements OnInit {
 
     let purchase = new Purchase();
 
-    purchase.customer = this.checkoutFormGroup.controls['customer'].value;
+    const customerValue = this.checkoutFormGroup.controls['customer'].value;
+    purchase.user = {
+      firstName: customerValue.firstName,
+      lastName: customerValue.lastName,
+      email: customerValue.email,
+      username: customerValue.email,
+      password: 'guest'
+    };
 
     purchase.shippingAddress = this.checkoutFormGroup.controls['shippingAddress'].value;
     const shippingState: State = JSON.parse(JSON.stringify(purchase.shippingAddress.state));
