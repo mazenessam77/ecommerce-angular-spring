@@ -188,26 +188,21 @@ export class CheckoutComponent implements OnInit {
 
   onSubmit() {
 
-    //  console.log(this.checkoutFormGroup.get('customer')?.value)
-
     if (this.checkoutFormGroup.invalid) {
       this.checkoutFormGroup.markAllAsTouched();
       return;
     }
-    // set up order
-    // get cart items
+
     let order = new Order();
     order.totalPrice = this.totalPrice;
     order.totalQuantity = this.totalQuantity;
 
-
     const cartItems = this.cartService.cartItems;
-
-    // create orderItems from cartItems
     let orderItems: OrderItem[] = cartItems.map(tempCartItem => new OrderItem(tempCartItem));
 
-    //set up purchase
     let purchase = new Purchase();
+
+    purchase.customer = this.checkoutFormGroup.controls['customer'].value;
 
     purchase.shippingAddress = this.checkoutFormGroup.controls['shippingAddress'].value;
     const shippingState: State = JSON.parse(JSON.stringify(purchase.shippingAddress.state));
@@ -215,75 +210,27 @@ export class CheckoutComponent implements OnInit {
     purchase.shippingAddress.state = shippingState.name;
     purchase.shippingAddress.country = shippingCountry.name;
 
-    //customer
-
-    purchase.customer = this.checkoutFormGroup.controls['customer'].value;
-
-    // billing address
     purchase.billingAddress = this.checkoutFormGroup.controls['billingAddress'].value;
     const billingState: State = JSON.parse(JSON.stringify(purchase.billingAddress.state));
     const billingCountry: Country = JSON.parse(JSON.stringify(purchase.billingAddress.country));
     purchase.billingAddress.state = billingState.name;
     purchase.billingAddress.country = billingCountry.name;
 
-    // populate purchase
     purchase.order = order;
     purchase.orderItems = orderItems;
 
-    // stripe because cents
-    this.paymentInfo.amount = Math.round(this.totalPrice * 100);
-    this.paymentInfo.currency = "USD";
-    this.paymentInfo.receiptEmail = purchase.customer.email;
-
-    // if form valid , create payment intent
-    if (!this.checkoutFormGroup.invalid && this.displayError.textContent === "") {
-      this.isDisabled = true;
-      this.checkoutService.createPaymentIntent(this.paymentInfo).subscribe(
-        (paymentIntentResponse) => {
-          this.stripe.confirmCardPayment(paymentIntentResponse.client_secret,
-            {
-              payment_method: {
-                card: this.cardElement,
-                billing_details: {
-                  email: purchase.customer.email,
-                  name: `${purchase.customer.firstName} ${purchase.customer.lastName}`,
-                  address: {
-                    line1: purchase.billingAddress.state,
-                    city: purchase.billingAddress.city,
-                    state: purchase.billingAddress.state,
-                    postal_code: purchase.billingAddress.zipCode,
-                    country: this.billingAddressCountry?.value.code
-                  }
-                }
-              }
-            },
-            {
-              handleActions: false
-            }).then((result: any) => {
-              if (result.error) {
-                alert(`There was an error: ${result.error.message}`);
-                this.isDisabled = false;
-              } else {
-                this.checkoutService.placeOrder(purchase).subscribe({
-                  next: (response: any) => {
-                    alert(`Your order has been received. \nOrder tracking number: ${response.orderTrackingNumber}`);
-
-                    //reset cart
-                    this.isDisabled = false;
-                    this.resetCart();
-                  },
-                  error: (err: any) => {
-                    this.isDisabled = false;
-                    alert(`There was an error: ${err.message}`);
-                  }
-                });
-              }
-            });
-        }
-      );
-    } else {
-      this.checkoutFormGroup.markAllAsTouched();
-    }
+    this.isDisabled = true;
+    this.checkoutService.placeOrder(purchase).subscribe({
+      next: (response: any) => {
+        alert(`Purchase completed successfully!\nOrder tracking number: ${response.orderTrackingNumber}`);
+        this.isDisabled = false;
+        this.resetCart();
+      },
+      error: (err: any) => {
+        this.isDisabled = false;
+        alert(`There was an error: ${err.message}`);
+      }
+    });
 
 
 
