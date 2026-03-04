@@ -55,17 +55,19 @@ public class SecurityConfig {
 	    .authorizeHttpRequests(auth -> auth
 		.requestMatchers("/h2/**").permitAll()
 		.requestMatchers("/api/orders/**").authenticated()
-		.requestMatchers("/states/**").permitAll()
-		.requestMatchers(HttpMethod.GET, "/products/**").permitAll()
-		.requestMatchers("/countries/**").permitAll()
-		.requestMatchers(HttpMethod.GET, "/product-categories/**").permitAll()
+		.requestMatchers("/api/v1/states/**").permitAll()
+		.requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+		.requestMatchers(HttpMethod.POST, "/api/v1/products/**").hasRole("ADMIN")
+		.requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasRole("ADMIN")
+		.requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").hasRole("ADMIN")
+		.requestMatchers("/api/v1/countries/**").permitAll()
+		.requestMatchers(HttpMethod.GET, "/api/v1/product-categories/**").permitAll()
 		.requestMatchers("/v3/api-docs/**",
 			"/configuration/ui", "/swagger-resources/**",
 			"/configuration/security", "/webjars/**",
 			"/swagger-ui/**").permitAll()
-		.requestMatchers("/checkout/**").permitAll()
-		.requestMatchers("/api/auth/**").permitAll()
-		.requestMatchers("/**").permitAll()
+		.requestMatchers("/api/v1/checkout/**").permitAll()
+		.requestMatchers("/api/v1/auth/**").permitAll()
 		.anyRequest().authenticated()
 	    )
 	    .httpBasic(withDefaults())
