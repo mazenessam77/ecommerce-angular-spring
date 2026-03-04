@@ -103,6 +103,11 @@ resource "aws_ecs_task_definition" "backend" {
     }
   }])
 
+  # CI/CD pipeline manages container image after initial deploy
+  lifecycle {
+    ignore_changes = [container_definitions]
+  }
+
   tags = { Name = "${var.project_name}-backend-task" }
 }
 
@@ -121,6 +126,11 @@ resource "aws_ecs_service" "backend" {
     subnets          = aws_subnet.public[*].id
     security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = true
+  }
+
+  # CI/CD pipeline manages task definition revisions
+  lifecycle {
+    ignore_changes = [task_definition]
   }
 
   tags = { Name = "${var.project_name}-backend-service" }
